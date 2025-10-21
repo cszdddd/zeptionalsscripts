@@ -3,138 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Glass Chat</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='-.1em' font-size='100'%3E💬%3C/text%3E%3C/svg%3E">
 
-    <!-- Firebase Configuration (keep script within HTML for simplicity, though can be external) -->
+    <!-- Firebase SDK (Your provided versions) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-    <script>
-        // Firebase config and functions remain the same
-        const firebaseConfig = {
-            apiKey: "AIzaSyAe0hXfAJ0ijKNiGgAVfv4zG1ngADF2E4c",
-            authDomain: "chatapp-90c78.firebaseapp.com",
-            projectId: "chatapp-90c78",
-            storageBucket: "chatapp-90c78.appspot.com",
-            messagingSenderId: "195015101932",
-            appId: "1:195015101932:web:f352296f341c58458a84c9",
-            databaseURL: "https://chatapp-90c78-default-rtdb.firebaseio.com"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        function sendMessage(username, messageText, profilePicUrl) {
-            db.ref('messages').push().set({
-                username: username,
-                message: messageText,
-                profilePic: profilePicUrl,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        function listenForMessages() {
-            db.ref('messages').on('child_added', (snapshot) => {
-                const messageData = snapshot.val();
-                addMessageToChat(messageData.username, messageData.message, messageData.profilePic);
-            });
-        }
-
-        function addMessageToChat(username, messageText, profilePicUrl) {
-            const messagesContainer = document.getElementById('messages-container');
-            const messageContainer = document.createElement('div');
-            messageContainer.classList.add('message-container');
-            
-            const profileDiv = document.createElement('div');
-            profileDiv.classList.add('message-profile');
-            
-            const profileImage = document.createElement('img');
-            profileImage.src = profilePicUrl || 'https://via.placeholder.com/40';
-            profileImage.classList.add('message-avatar');
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.classList.add('message-content');
-            
-            const usernameSpan = document.createElement('span');
-            usernameSpan.classList.add('message-username');
-            usernameSpan.textContent = username;
-            
-            const messageSpan = document.createElement('span');
-            messageSpan.classList.add('message-text');
-            messageSpan.textContent = messageText;
-            
-            profileDiv.appendChild(profileImage);
-            contentDiv.appendChild(usernameSpan);
-            contentDiv.appendChild(messageSpan);
-            messageContainer.appendChild(profileDiv);
-            messageContainer.appendChild(contentDiv);
-            
-            messagesContainer.appendChild(messageContainer);
-            messagesContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-
-        function initializeDashboard() {
-            const username = localStorage.getItem('username') || 'Guest';
-            document.getElementById('welcome-username').textContent = `Welcome, ${username}`;
-            document.getElementById('profile-avatar').src = localStorage.getItem('profilePic') || 'https://via.placeholder.com/48';
-            listenForMessages();
-        }
-
-        function signOut() {
-            // Placeholder for sign out logic
-            console.log('Signing out...');
-        }
-        
-        function showTOSModal() {
-            // Placeholder for TOS modal logic
-            console.log('Showing TOS modal...');
-        }
-
-        window.onload = function() {
-            if (!localStorage.getItem('acceptedTOS')) {
-                showTOSModal();
-            } else {
-                initializeDashboard();
-            }
-        };
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatInput = document.getElementById('chat-input');
-            chatInput.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    const messageText = event.target.value;
-                    const username = localStorage.getItem('username') || 'Guest';
-                    const profilePicUrl = localStorage.getItem('profilePic') || 'https://via.placeholder.com/40';
-                    if (messageText.trim() !== '') {
-                        sendMessage(username, messageText, profilePicUrl);
-                        event.target.value = '';
-                    }
-                }
-            });
-        });
-    </script>
 </head>
 <body>
-    <div class="background-container"></div>
-    <div class="dashboard-container">
-        <header class="glass-effect header">
-            <img id="profile-avatar" class="profile-avatar" src="https://via.placeholder.com/48" alt="Profile">
-            <h1 id="welcome-username" class="welcome-text">Welcome, USERNAME</h1>
-            <div class="nav-buttons">
-                <button class="nav-button glass-effect" onclick="window.location.href='settings.html'">Settings</button>
-                <button class="nav-button glass-effect" onclick="window.location.href='profile.html'">Profile</button>
-                <button class="nav-button glass-effect" onclick="signOut()">Sign Out</button>
-            </div>
-        </header>
-    
-        <div id="messages-container" class="messages-container">
-            <!-- Messages will be dynamically added here -->
+    <div class="background-texture"></div> <!-- For the background blur effect -->
+
+    <div class="chat-container">
+        <h1>Glass Chat</h1>
+
+        <div class="username-input-area">
+            <input type="text" id="username-input" placeholder="Your name..." autocomplete="off">
         </div>
-    
-        <div class="chat-input-container">
-            <input type="text" id="chat-input" class="chat-input glass-effect" placeholder="Type message here..." />
+
+        <div id="chat-messages" class="chat-messages">
+            <!-- Messages will be loaded here -->
+        </div>
+
+        <div class="message-input-area">
+            <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+            <button id="send-button">Send</button>
         </div>
     </div>
+
+    <!-- Your custom script -->
+    <script src="script.js"></script>
 </body>
 </html>
