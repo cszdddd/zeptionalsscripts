@@ -3,48 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chromebook Web App</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Zeptional Scripts</title>
+    <!-- Link to your manifest -->
+    <link rel="manifest" href="/zeptionalsscripts/manifest.json">
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #installBtn { display: none; padding: 15px 30px; font-size: 18px; cursor: pointer; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f4f4f9; }
+        #installBtn { display: none; padding: 12px 24px; font-size: 16px; color: white; background: #007bff; border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s; }
+        #installBtn:hover { background: #0056b3; }
+        .status { margin-top: 20px; color: #666; font-size: 14px; }
     </style>
 </head>
 <body>
 
+    <h1>Zeptional Scripts</h1>
     <button id="installBtn">Install App to Chromebook</button>
+    <div id="status" class="status">Checking for installation...</div>
 
     <script>
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
+        const statusDiv = document.getElementById('status');
 
-        // Check if service worker is supported
+        // 1. Register Service Worker (Crucial for GitHub Pages)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('/zeptionalsscripts/sw.js')
+                .then(reg => console.log('SW Registered!', reg))
+                .catch(err => console.log('SW Failed!', err));
         }
 
-        // Listen for the install prompt
+        // 2. Capture the install prompt event
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); // Prevent automatic prompt
+            e.preventDefault(); // Stop Chrome from showing its own prompt
             deferredPrompt = e;
-            installBtn.style.display = 'block'; // Show button when ready
+            installBtn.style.display = 'block'; // Show our custom button
+            statusDiv.innerText = "Ready to install!";
         });
 
+        // 3. Trigger installation on click
         installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt(); // Show the install dialog
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('User installed the app');
-                }
-                deferredPrompt = null;
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt(); // Show the actual browser install dialog
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('User accepted install');
                 installBtn.style.display = 'none';
+                statusDiv.innerText = "Installing...";
             }
+            deferredPrompt = null;
         });
 
-        // Detect when app is launched as a standalone window
+        // 4. Detect when it's been installed
         window.addEventListener('appinstalled', () => {
-            console.log('PWA installed successfully');
+            statusDiv.innerText = "App successfully installed!";
+            console.log('PWA was installed');
         });
     </script>
 </body>
