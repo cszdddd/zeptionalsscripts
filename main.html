@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chromebook Web App</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #installBtn { display: none; padding: 15px 30px; font-size: 18px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <button id="installBtn">Install App to Chromebook</button>
+
+    <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        // Check if service worker is supported
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // Listen for the install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // Prevent automatic prompt
+            deferredPrompt = e;
+            installBtn.style.display = 'block'; // Show button when ready
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt(); // Show the install dialog
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User installed the app');
+                }
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            }
+        });
+
+        // Detect when app is launched as a standalone window
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed successfully');
+        });
+    </script>
+</body>
+</html>
