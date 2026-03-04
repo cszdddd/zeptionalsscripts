@@ -1,9 +1,9 @@
-// Basic Service Worker to enable PWA installation
+// Minimal Service Worker for PWA compliance
 self.addEventListener('install', (event) => {
-    console.log('SW Installed');
+    self.skipWaiting();
 });
 
 self.addEventListener('fetch', (event) => {
-    // Required to meet installability criteria
+    // This allows the app to be 'installable'
     event.respondWith(fetch(event.request));
 });
